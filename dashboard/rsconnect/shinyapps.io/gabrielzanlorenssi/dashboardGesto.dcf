@@ -1,0 +1,13 @@
+name: dashboardGesto
+title: dashboardGesto
+username:
+account: gabrielzanlorenssi
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4247916
+bundleId: 4696307
+url: https://gabrielzanlorenssi.shinyapps.io/dashboardGesto/
+when: 1623239266.78122
+lastSyncTime: 1623239266.78122
+asMultiple: FALSE
+asStatic: FALSE
