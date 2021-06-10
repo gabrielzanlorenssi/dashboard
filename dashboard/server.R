@@ -20,6 +20,7 @@ shinyServer(function(input, output) {
 
 
 # Download relatorio ------------------------------------------------------
+    
     output$downloadReport <- downloadHandler(
         filename = function() {
             paste('my-report', sep = '.', switch(
@@ -44,6 +45,27 @@ shinyServer(function(input, output) {
             file.rename(out, file)
         }
     )
+    
+
+# Download dos dados ------------------------------------------------------
+
+    output$downloadData <- downloadHandler(
+        filename = function() {
+            paste("caruaru_", Sys.Date(), ".csv", sep = "")
+        },
+        content = function(file) {
+            write.csv(escolas, file, row.names = FALSE)
+        }
+    )
+
+
+# Autenticação ------------------------------------------------------------
+
+    result_auth <- secure_server(check_credentials = check_credentials(credentials))
+    
+    output$res_auth <- renderPrint({
+        reactiveValuesToList(result_auth)
+    })            
 
 #--    
 })
