@@ -3,6 +3,8 @@ library(shinydashboard)
 library(shiny)
 library(tidyverse)
 library(shinymanager)
+library(plotly)
+library(DT)
 
 #--- data
 escolas <- read_csv("data/escola_segura.csv")
@@ -17,24 +19,24 @@ textoDownload = HTML(paste0("<p>Nesta seção, é possível baixar os gráficos 
                      "Os dados também podem ser baixados em formato de tabela."))
 
 #--- inactivity
-inactivity <- "function idleTimer() {
-var t = setTimeout(logout, 120000);
-window.onmousemove = resetTimer; // catches mouse movements
-window.onmousedown = resetTimer; // catches mouse movements
-window.onclick = resetTimer;     // catches mouse clicks
-window.onscroll = resetTimer;    // catches scrolling
-window.onkeypress = resetTimer;  //catches keyboard actions
-
-function logout() {
-window.close();  //close the window
-}
-
-function resetTimer() {
-clearTimeout(t);
-t = setTimeout(logout, 120000);  // time is in milliseconds (1000 is 1 second)
-}
-}
-idleTimer();"
+# inactivity <- "function idleTimer() {
+# var t = setTimeout(logout, 120000);
+# window.onmousemove = resetTimer; // catches mouse movements
+# window.onmousedown = resetTimer; // catches mouse movements
+# window.onclick = resetTimer;     // catches mouse clicks
+# window.onscroll = resetTimer;    // catches scrolling
+# window.onkeypress = resetTimer;  //catches keyboard actions
+# 
+# function logout() {
+# window.close();  //close the window
+# }
+# 
+# function resetTimer() {
+# clearTimeout(t);
+# t = setTimeout(logout, 120000);  // time is in milliseconds (1000 is 1 second)
+# }
+# }
+# idleTimer();"
 
 #--- credenciais
 credentials <- data.frame(
@@ -45,33 +47,74 @@ credentials <- data.frame(
 
 #--- dashboard
 
-secure_app(head_auth = tags$script(inactivity), language="pt-BR",
+secure_app(language="pt-BR",
            dashboardPage(
     skin="green",
     #-- header
     dashboardHeader(title="Escola Segura - Instituto Gesto", titleWidth = 450),
     #-- sidebar
-    dashboardSidebar(menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
+    dashboardSidebar(br(),
+                     sidebarMenu(
+                     menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
                      selectInput("variable1", "Selecione o município:",
                                  options1),
                      selectInput("variable2", "Selecione a escola:",
                                  options2),
-                     sliderInput("slider", "Slider", 1, 100, 50),
-                     menuItem("Download", tabName = "download", icon = icon("th")),
-                     menuItem("Como usar", tabName = "instructions", icon = icon("dashboard"))),
+                     dateRangeInput('dateRange',
+                                    label = 'Selecione uma data (opcional):',
+                                    start = as.Date("2021-01-01"),
+                                    format = "dd/mm/yy",
+                                    language = "pt-BR",
+                                    startview = "month",
+                                    end = Sys.Date()
+                     ),
+                     br(),
+                     menuItem("Download", tabName = "download", icon = icon("download")),
+                     br(),
+                     menuItem("Como usar", tabName = "instr", icon = icon("question-circle")))),
     #-- body
     dashboardBody(
         tabItems(tabItem(tabName = "dashboard",
                 h2("Caruaru (PE)"),
         fluidRow(
             # A static valueBox
-            valueBox(36, "Casos de covid-19 em 2021", icon = icon("credit-card")),
+            valueBox(360, "Casos registrados em escolas", icon = icon("credit-card")),
             
             # Dynamic valueBoxes
             valueBoxOutput("progressBox"),
             
             valueBoxOutput("approvalBox")
-        )),
+        ),
+        fluidRow(
+            box(
+                title = "Caruaru (PE)", status = "warning", solidHeader = TRUE,
+                p("População: 356.000"),
+                p("Número de escolas: 356"),
+                p("Número de estudantes: 15.680"),
+                p("Número de funcionários e professores: 1.325"),
+                p("Casos no município: 15.607"),
+                p("Média móvel nos últimos sete dias: 35 casos"),
+                p("Variação nos últimos sete dias: +15%")
+            ),
+            box(
+                title = "Visão da escola", status = "danger", solidHeader = TRUE,
+                strong(p("ESCOLA ESTADUAL GRACCHO CARDOSO")),
+                p("Escola Rural"),
+                p("Total de estudantes: 867"),
+                p("Total de funcionários e professores: 85"),
+                p("Nota no IDEB: 6,5"),
+                p("Total de casos: 55 casos"),
+                p("Casos nos últimos 14 dias: 10 casos")
+            )
+        ),
+        fluidRow(box(plotlyOutput('plot1'), title="Casos por local da escola"),
+                box(plotlyOutput('plot2'), title="Casos por membro da comunidade")),
+        fluidRow(box(plotlyOutput('plot4'), title="Casos diários: local"),
+                 box(plotlyOutput('plot3'), title="Casos diários: membro")),
+        h3('Casos por escola:'),
+        radioButtons(inputId="radio1", label="", choices=c("Números absoultos", "Valores percentuais")),
+        fluidRow(DTOutput('tbl'))),
+        #-- downloads
         tabItem(tabName = "download",
                 h2("Download dos dados"),
                 br(),
@@ -91,7 +134,7 @@ secure_app(head_auth = tags$script(inactivity), language="pt-BR",
                 radioButtons('formatDoc', 'Formato da tabela', c('Excel', 'CSV'),
                              inline = TRUE),
                 downloadButton("downloadDatabase", "Baixe os dados do município como tabela")),
-        tabItem(tabName = "instructions",
+        tabItem(tabName = "instr",
                 h2("Como usar"),
                 p(texto))
     ))))
