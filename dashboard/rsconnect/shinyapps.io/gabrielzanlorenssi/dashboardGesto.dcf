@@ -5,9 +5,9 @@ account: gabrielzanlorenssi
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4247916
-bundleId: 4699474
+bundleId: 4705157
 url: https://gabrielzanlorenssi.shinyapps.io/dashboardGesto/
-when: 1623297797.06403
-lastSyncTime: 1623297797.06403
+when: 1623414369.93708
+lastSyncTime: 1623414369.93708
 asMultiple: FALSE
 asStatic: FALSE

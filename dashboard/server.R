@@ -8,14 +8,14 @@ shinyServer(function(input, output) {
     
     output$progressBox <- renderValueBox({
         valueBox(
-            paste0(108), "Casos em escolas nos últimos 14 dias", icon = icon("list"),
+            paste0(108), "Casos em escolas nos últimos 14 dias",
             color = "red"
         )
     })
     
     output$approvalBox <- renderValueBox({
         valueBox(
-            "80%", "Casos em escolas estão ativos", icon = icon("thumbs-up", lib = "glyphicon"),
+            "80%", "de adesão ao questionário",
             color = "red"
         )
     })
@@ -59,7 +59,7 @@ shinyServer(function(input, output) {
             write.csv(escolas, file, row.names = FALSE)
         }
     )
-
+    
 
 # Autenticação ------------------------------------------------------------
 
@@ -70,6 +70,18 @@ shinyServer(function(input, output) {
     output$auth_output <- renderPrint({
         reactiveValuesToList(res_auth)
     })
+
+    
+
+
+# Municípios --------------------------------------------------------------
+
+   # user <- reactiveValues(logged=FALSE, usuario = NULL)
+   #  
+   # observeEvent(usuario, {
+   #              user$usuario=input$shinymanager_where$user})
+   
+   text_user <- renderText({"user$usuario"})
     
 # Plots -------------------------------------------------------------------
 
