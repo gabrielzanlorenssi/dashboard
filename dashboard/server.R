@@ -2,6 +2,15 @@ library(shiny)
 library(shinydashboard)
 library(lubridate)
 library(DT)
+library(readxl)
+
+
+#--- data
+escolas <- read_csv("data/escola_segura.csv")
+
+options2 <- c("ESCOLA MUNICIPAL ABCDE", unique(escolas[[4]]))
+
+credentials <- read_excel('credentials.xlsx')
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -9,54 +18,58 @@ shinyServer(function(input, output) {
     output$progressBox <- renderValueBox({
         valueBox(
             paste0(108), "Casos em escolas nos últimos 14 dias",
-            color = "red"
+            color = "green"
         )
     })
     
     output$approvalBox <- renderValueBox({
         valueBox(
             "80%", "de adesão ao questionário",
-            color = "red"
+            color = "green"
         )
     })
 
 
 # Download relatorio ------------------------------------------------------
     
-    output$downloadReport <- downloadHandler(
-        filename = function() {
-            paste('my-report', sep = '.', switch(
-                input$format, PDF = 'pdf', HTML = 'html', Word = 'docx'
-            ))
-        },
-        
-        content = function(file) {
-            src <- normalizePath('report.Rmd')
-            
-            # temporarily switch to the temp dir, in case you do not have write
-            # permission to the current working directory
-            owd <- setwd(tempdir())
-            on.exit(setwd(owd))
-            file.copy(src, 'report.Rmd', overwrite = TRUE)
-            
-            library(rmarkdown)
-            out <- render('report.Rmd', switch(
-                input$format,
-                PDF = pdf_document(), HTML = html_document(), Word = word_document()
-            ))
-            file.rename(out, file)
-        }
-    )
-    
+    # output$downloadReport <- downloadHandler(
+    #     filename = function() {
+    #         paste('my-report', sep = '.', switch(
+    #             input$format, PDF = 'pdf', HTML = 'html', Word = 'docx'
+    #         ))
+    #     },
+    #     
+    #     content = function(file) {
+    #         src <- normalizePath('report.Rmd')
+    #         
+    #         # temporarily switch to the temp dir, in case you do not have write
+    #         # permission to the current working directory
+    #         owd <- setwd(tempdir())
+    #         on.exit(setwd(owd))
+    #         file.copy(src, 'report.Rmd', overwrite = TRUE)
+    #         
+    #         library(rmarkdown)
+    #         out <- render('report.Rmd', switch(
+    #             input$format,
+    #             PDF = pdf_document(), HTML = html_document(), Word = word_document()
+    #         ))
+    #         file.rename(out, file)
+    #     }
+    # )
+
+# --- selecao da escola ---
+
+output$nomeEscola1 <- renderText({input$varible2})
+output$nomeEscola2 <- renderText({input$varible2})
 
 # Download dos dados ------------------------------------------------------
-
-    output$downloadData <- downloadHandler(
-        filename = function() {
-            paste("caruaru_", Sys.Date(), ".csv", sep = "")
+        
+    output$downloadDatabase <- downloadHandler(
+        file = function() {
+            paste("tabela_", Sys.Date(), input$formatDoc, sep = "")
         },
         content = function(file) {
-            write.csv(escolas, file, row.names = FALSE)
+            write.csv2(escolas[,c(1:15)], file, row.names = FALSE, fileEncoding = "latin1")
         }
     )
     
@@ -67,40 +80,48 @@ shinyServer(function(input, output) {
         check_credentials = check_credentials(credentials)
     )
     
-    output$auth_output <- renderPrint({
-        reactiveValuesToList(res_auth)
-    })
-
-    
-
-
 # Municípios --------------------------------------------------------------
 
-   # user <- reactiveValues(logged=FALSE, usuario = NULL)
-   #  
-   # observeEvent(usuario, {
-   #              user$usuario=input$shinymanager_where$user})
-   
-   text_user <- renderText({"user$usuario"})
+    creds_reactive <- reactive({
+        reactiveValuesToList(res_auth)
+    })
+    
+    #-- criar nome da cidade
+    output$munOutput <- renderText({creds_reactive()$cidade})
+    
+    #-- criar populacao
+    output$popText <- renderText({paste0("População: ", format(creds_reactive()$pop, big.mark=".", decimal.mark=",") )})
+        
+    #-- criar estado / municipio
+    output$munReferencia <- renderText({paste0("Visão do ", creds_reactive()$tipo)})
     
 # Plots -------------------------------------------------------------------
 
-    labels = c('Rural', 'Urbano')
-    values = c(450, 45)
+    labels = c('Confirmados', 'Suspeitos')
+    values = c(55, 20)
+    colors1 = c("#CB2B23", "#5F1E88")
     
     output$plot1 <- renderPlotly({
-        plot_ly(type='pie', labels=labels, values=values, 
+        plot_ly(type='pie', labels=labels, values=values, hole=0.6,
                    textinfo='label+percent',
-                   insidetextorientation='radial')
+                   insidetextorientation='radial',
+                marker = list(colors = colors1))  
     })
     
-    labels2 = c('Aluno', 'Professor', 'Funcionário')
-    values2 = c(135, 25, 10)
+    labels2 = c('Estudante', 'Professor', 'Demais profissionais')
+    values2 = c(65, 25, 18)
+    colors2 = c("#CB8B23", "#2A2C8B", "#157A7A")
     
     output$plot2<- renderPlotly({
-        plot_ly(type='pie', labels=labels2, values=values2, 
+        plot_ly(type='pie', labels=labels2, values=values2, hole=0.6,
                             textinfo='label+percent',
-                            insidetextorientation='radial')    
+                            insidetextorientation='radial',
+                hoverinfo = 'text',
+                text = ~paste('Casos: ', values2),
+                marker = list(colors = colors2)) %>% 
+            layout(
+                   xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                   yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
     })
 
 # Lines -------------------------------------------------------------------
