@@ -5,6 +5,8 @@ library(tidyverse)
 library(shinymanager)
 library(plotly)
 library(DT)
+library(readxl)
+library(lubridate)
 
 #--- data
 escolas <- read_csv("data/escola_segura.csv")
@@ -88,7 +90,7 @@ secure_app(language="pt-BR", head_auth = tags$script(inactivity),
         fluidRow(box(plotlyOutput('plot4'), title="Casos diários: local"),
                  box(plotlyOutput('plot3'), title="Casos diários: membro")),
         h3('Casos por escola:'),
-        radioButtons(inputId="radio1", label="", choices=c("Números absoultos", "Valores percentuais")),
+        radioButtons(inputId="radio1", label="", choices=c("Todos", "Estudantes", "Professores", "Demais profissionais")),
         fluidRow(DTOutput('tbl'))),
         #-- escola
         tabItem(tabName = "escola",
@@ -109,25 +111,12 @@ secure_app(language="pt-BR", head_auth = tags$script(inactivity),
                 ))), 
         #-- downloads
         tabItem(tabName = "download",
-                h2("Download dos dados"),
+                h2("Dados completos e download"),
                 br(),
                 br(),
-                p("Nesta seção, é possível baixar o dados por município, em formato de tabela, tal como consta na planilha original do Google Forms utilizado para o preenchimento."),
+                p("Nesta seção, é possível baixar o dados por município, em formato de tabela, tal como consta na planilha original do Google Forms utilizado para o preenchimento. Os botões para download ficam na parte inferior da tabela."),
                 #p("Também é possível baixar um relatório, que reúne as informações apresentadas na Dashboard do município."),
-                br(),
-                br(),
-                br(),
-                br(),
-                #radioButtons('format', 'Formato do documento', c('PDF', 'HTML', 'Word'),
-                #             inline = TRUE),
-                #downloadButton("downloadReport", "Baixe um relatório do município"),
-                #br(),
-                #br(),
-                #br(),
-                #br(),
-                radioButtons('formatDoc', 'Formato da tabela', choiceValues=c('.csv'), choiceNames=c("CSV"),
-                             inline = TRUE),
-                downloadButton("downloadDatabase", "Baixe os dados do município como tabela")),
+                fluidRow(DTOutput('tblPrincipal'))),
         #--- como usar
         tabItem(tabName = "instr",
                 h2("Como usar"),

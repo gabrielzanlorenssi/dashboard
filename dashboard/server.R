@@ -1,10 +1,3 @@
-library(shiny)
-library(shinydashboard)
-library(lubridate)
-library(DT)
-library(readxl)
-
-
 #--- data
 escolas <- read_csv("data/escola_segura.csv")
 
@@ -59,19 +52,19 @@ shinyServer(function(input, output) {
 
 # --- selecao da escola ---
 
-output$nomeEscola1 <- renderText({input$varible2})
-output$nomeEscola2 <- renderText({input$varible2})
+output$nomeEscola1 <- renderText({input$variable2})
+output$nomeEscola2 <- renderText({input$variable2})
 
 # Download dos dados ------------------------------------------------------
         
-    output$downloadDatabase <- downloadHandler(
-        file = function() {
-            paste("tabela_", Sys.Date(), input$formatDoc, sep = "")
-        },
-        content = function(file) {
-            write.csv2(escolas[,c(1:15)], file, row.names = FALSE, fileEncoding = "latin1")
-        }
-    )
+    # output$downloadDatabase <- downloadHandler(
+    #     file = function() {
+    #         paste("tabela_", Sys.Date(), input$formatDoc, sep = "")
+    #     },
+    #     content = function(file) {
+    #         write.csv2(escolas[,c(1:15)], file, row.names = FALSE, fileEncoding = "latin1")
+    #     }
+    # )
     
 
 # Autenticação ------------------------------------------------------------
@@ -95,6 +88,7 @@ output$nomeEscola2 <- renderText({input$varible2})
     #-- criar estado / municipio
     output$munReferencia <- renderText({paste0("Visão do ", creds_reactive()$tipo)})
     
+    
 # Plots -------------------------------------------------------------------
 
     labels = c('Confirmados', 'Suspeitos')
@@ -108,7 +102,7 @@ output$nomeEscola2 <- renderText({input$varible2})
                 marker = list(colors = colors1))  
     })
     
-    labels2 = c('Estudante', 'Professor', 'Demais profissionais')
+    labels2 = c('Estudante', 'Professores', 'Demais profissionais')
     values2 = c(65, 25, 18)
     colors2 = c("#CB8B23", "#2A2C8B", "#157A7A")
     
@@ -140,40 +134,68 @@ output$nomeEscola2 <- renderText({input$varible2})
     
     output$plot3 <- renderPlotly({
         plot_ly(data, x = ~dates, mode="lines") %>% 
-        add_trace(y = ~c_alunos, name = 'Alunos') %>% 
-        add_trace(y = ~c_professores, name = 'Professores') %>% 
-        add_trace(y = ~c_funcionarios, name = 'Funcionários') %>% 
+        add_trace(y = ~c_alunos, name = 'Estudantes', line = list(color = "#CB8B23")) %>% 
+        add_trace(y = ~c_professores, name = 'Professores',  line = list(color = "#2A2C8B")) %>% 
+        add_trace(y = ~c_funcionarios, name = 'Funcionários',  line = list(color = "#157A7A")) %>% 
         layout(yaxis = list(title = 'Número de casos'))    
     })
     
-    
-    
+
     c_rural <- abs(round(rnorm(30,25,7)))
     c_urbano <- abs(round(rnorm(30,4,1)))
     
     data2 <- data.frame(dates, c_rural, c_urbano)
-    
-    
+
     output$plot4 <- renderPlotly({
         plot_ly(data2, x = ~dates, mode="lines") %>% 
-            add_trace(y = ~c_urbano, name = 'Urbano') %>% 
-            add_trace(y = ~c_rural, name = 'Rural') %>% 
+            add_trace(y = ~c_urbano, name = 'Confirmados', line=list(color= "#CB2B23")) %>% 
+            add_trace(y = ~c_rural, name = 'Suspeitos', line=list(color="#5F1E88")) %>% 
             layout(yaxis = list(title = 'Número de casos'))    
     })
     
 
 # Tabelas -----------------------------------------------------------------
 
-    ce_alunos <- c(12,3,5,6,7,10,2,0,0,6)
-    ce_prof <- c(5,0,2,1,8,0,3,1,0,2)
+    Suspeitos <- c(12,3,5,6,7,10,2,0,0,6)
+    Confirmados <- c(5,0,2,1,8,0,3,1,0,2)
     ce_func <- c(3,1,0,3,2,0,1,0,0,1)
     
-    tabela <- data.frame(Escola=options2[2:11], ce_alunos, ce_prof, ce_func) %>% 
-        mutate(Total = ce_alunos+ce_prof+ce_func)
+    tabela <- data.frame(Escola=options2[2:11], Confirmados, Suspeitos) %>% 
+        mutate(Total = Confirmados+Suspeitos)
     
     
     output$tbl = renderDT(
-        tabela, options = list(lengthChange = FALSE, language=list(url="https://cdn.datatables.net/plug-ins/1.10.19/i18n/Portuguese.json")))    
+        tabela,
+        extensions='Buttons',
+        class = "display",
+         options = list(lengthChange = FALSE, 
+         paging = TRUE,
+                                searching = TRUE,
+                                fixedColumns = TRUE,
+                                autoWidth = TRUE,
+                                ordering = TRUE,
+                                dom = 'tB',
+                                buttons = c('copy', 'csv', 'excel'),
+        language=list(url="https://cdn.datatables.net/plug-ins/1.10.19/i18n/Portuguese.json")))   
+    
+#-- tabela principal
+    output$tblPrincipal = renderDT(
+        escolas[,c(2:15)],
+        extensions='Buttons',
+        class = "display",
+        options = list(lengthChange = FALSE, 
+                       paging = TRUE,
+                       searching = TRUE,
+                       fixedColumns = TRUE,
+                       autoWidth = TRUE,
+                       ordering = TRUE,
+                       scrollX = TRUE,
+                       dom = 'tB',
+                       buttons = c('copy', 'csv', 'excel'),
+                       language=list(url="https://cdn.datatables.net/plug-ins/1.10.19/i18n/Portuguese.json")))
     
 #--    
 })
+
+
+                            
