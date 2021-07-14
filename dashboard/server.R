@@ -1,5 +1,7 @@
 #--- data
-escolas <- read_csv("data/escola_segura.csv")
+
+
+ <- read_csv("data/escola_segura.csv")
 
 escolas01 <- read_rds("escolas01.rds") %>% 
     mutate(id=paste0(NO_ENTIDADE, " (", CO_ENTIDADE, ")")) %>% 
@@ -42,7 +44,6 @@ shinyServer(function(input, output) {
     output$options <- renderUI({selectInput("variable2", "Selecione a escola:", mydata()$id)})
     
     #-- n escolas
-    
     output$escolasText <- renderText({nrow(mydata()) -> x
         paste0("Número de escolas na rede: ", x)})
     
@@ -176,8 +177,8 @@ shinyServer(function(input, output) {
     colors5 = c("#AA8E39", "#983351")
     
     output$plot5<- renderPlotly({
-        a <- mydata() %>% filter(TP_LOCALIZACAO=="Urbana")
-        b <- mydata() %>% filter(TP_LOCALIZACAO=="Rural")
+        b <- mydata() %>% filter(TP_LOCALIZACAO=="Urbana")
+        a <- mydata() %>% filter(TP_LOCALIZACAO=="Rural")
         
         plot_ly(type='pie', labels=labels5, values=c(sum(a$TOTAL,na.rm=T),
                                                     sum(b$TOTAL,na.rm=T)), hole=0.6,
@@ -193,7 +194,7 @@ shinyServer(function(input, output) {
     })
     
     #-- grafico 6
-    labels6 = c('Últimos 15 dias', 'Casos antigos')
+    labels6 = c('Últimos 14 dias', 'Casos antigos')
     values6 = c(30,10)
     colors6 = c("#1a1a1a", "#c5c5c5")
     
@@ -256,7 +257,22 @@ shinyServer(function(input, output) {
                                 ordering = TRUE,
                                 dom = 'tB',
                                 buttons = c('copy', 'csv', 'excel'),
-        language=list(url="https://cdn.datatables.net/plug-ins/1.10.19/i18n/Portuguese.json")))   
+        language=list(url="https://cdn.datatables.net/plug-ins/1.10.19/i18n/Portuguese.json"))) 
+    
+    output$tbl = renderDT(
+        tabela(),
+        extensions='Buttons',
+        class = "display",
+        colnames = c("INEP", "Escola", "Local", "Total", "Conf.", "Susp."),
+        options = list(lengthChange = FALSE, 
+                       paging = TRUE,
+                       searching = TRUE,
+                       fixedColumns = TRUE,
+                       autoWidth = TRUE,
+                       ordering = TRUE,
+                       dom = 'tB',
+                       buttons = c('copy', 'csv', 'excel'),
+                       language=list(url="https://cdn.datatables.net/plug-ins/1.10.19/i18n/Portuguese.json")))  
     
 #-- tabela principal
     output$tblPrincipal = renderDT(
