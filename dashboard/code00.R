@@ -24,5 +24,7 @@ escolas00 %>%
   mutate(TP_LOCALIZACAO = ifelse(TP_LOCALIZACAO == 1, "Urbana", "Rural")) -> escolas01
   
 write_rds(escolas01, './data/escolas01.rds')
-  
+
+
+
   
