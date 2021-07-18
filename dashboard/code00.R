@@ -16,13 +16,17 @@ escolas00 <- read_delim("C:/freelances/escolas.CSV",
                       "|", escape_double = FALSE, trim_ws = TRUE)
 
 escolas00 %>% 
+  mutate(across(starts_with("QT_PROF_"), ~ ifelse(.x>999, 0, .x))) %>% 
+  mutate(QT_PROF = rowSums(across(starts_with("QT_PROF_")))) %>% 
   filter(TP_SITUACAO_FUNCIONAMENTO %in% c(1,2)) %>% 
-  select(CO_ENTIDADE, NO_ENTIDADE, CO_UF, CO_MUNICIPIO, TP_DEPENDENCIA, TP_LOCALIZACAO) %>%
+  select(CO_ENTIDADE, NO_ENTIDADE, CO_UF, CO_MUNICIPIO, TP_DEPENDENCIA, TP_LOCALIZACAO, QT_PROF) %>%
   filter((CO_UF %in% credentials$ibge & TP_DEPENDENCIA==2) |
           (CO_MUNICIPIO %in% credentials$ibge & TP_DEPENDENCIA==3)) %>% 
   select(-one_of('TP_DEPENDENCIA')) %>% 
   mutate(TP_LOCALIZACAO = ifelse(TP_LOCALIZACAO == 1, "Urbana", "Rural")) -> escolas01
   
 write_rds(escolas01, './data/escolas01.rds')
-  
+
+
+
   
