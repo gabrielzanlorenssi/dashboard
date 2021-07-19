@@ -244,7 +244,7 @@ shinyServer(function(input, output) {
                "Demais profissionais" = mydata()[,c(1,2,5,18,11,10)])
     })
     
-    output$tbl = renderDT(
+    output$tbl <- renderDT(
         tabela(),
         extensions='Buttons',
         class = "display",
@@ -259,11 +259,20 @@ shinyServer(function(input, output) {
                                 buttons = c('copy', 'csv', 'excel'),
         language=list(url="https://cdn.datatables.net/plug-ins/1.10.19/i18n/Portuguese.json"))) 
     
-    output$tbl = renderDT(
-        tabela(),
+    tabela2 <- reactive({
+        switch(input$radio1,
+               "Todos" = mydata()[,c(1,2,5,15,16,17)],
+               "Estudantes" = mydata()[,c(1,2,5,19,13,12)],
+               "Professores" = mydata()[,c(1,2,5,20,9,8)],
+               "Demais profissionais" = mydata()[,c(1,2,5,18,11,10)])
+    })
+    
+    output$tbl2 <- renderDT(
+        mydata()[,c(1,2,5,7,14)] %>% 
+            mutate(TP_LOCALIZACAO=ifelse(TP_LOCALIZACAO=="Urbana", "Aberta", "Fechada")),
         extensions='Buttons',
         class = "display",
-        colnames = c("INEP", "Escola", "Local", "Total", "Conf.", "Susp."),
+        colnames = c("INEP", "Escola", "Status", "Turmas fechadas", "Adesão"),
         options = list(lengthChange = FALSE, 
                        paging = TRUE,
                        searching = TRUE,
