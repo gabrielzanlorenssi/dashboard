@@ -1,7 +1,7 @@
 #--- data
 
 
- <- read_csv("data/escola_segura.csv")
+data.entry() <- read_csv("data/escola_segura.csv")
 
 escolas01 <- read_rds("escolas01.rds") %>% 
     mutate(id=paste0(NO_ENTIDADE, " (", CO_ENTIDADE, ")")) %>% 
