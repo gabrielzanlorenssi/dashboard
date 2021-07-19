@@ -1,12 +1,15 @@
 #--- libraries
 library(shinydashboard)
 library(shiny)
-library(tidyverse)
+library(dplyr)
+library(readr)
 library(shinymanager)
+library(lubridate)
+library(readxl)
 library(plotly)
 library(DT)
-library(readxl)
-library(lubridate)
+
+
 
 #--- data
 escolas <- read_csv("data/escola_segura.csv")
