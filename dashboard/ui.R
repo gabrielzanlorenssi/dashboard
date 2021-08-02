@@ -53,7 +53,7 @@ secure_app(language="pt-BR", head_auth = tags$script(inactivity),
            dashboardPage(
                skin="green",
                #-- header
-               dashboardHeader(title="Escola Segura - Instituto Gesto", titleWidth = 450),
+               dashboardHeader(title="Escola Segura - Instituto Gesto - teste", titleWidth = 450),
                #-- sidebar
                dashboardSidebar(br(),
                                 sidebarMenu(
