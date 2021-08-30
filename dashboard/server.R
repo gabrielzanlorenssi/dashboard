@@ -21,6 +21,8 @@ options2 <- c("ESCOLA MUNICIPAL ABCDE", unique(escolas[[4]]))
 
 credentials <- read_excel('credentials.xlsx')
 
+
+
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
     
@@ -73,6 +75,14 @@ shinyServer(function(input, output) {
     #-- criar estado / municipio
     output$munReferencia <- renderText({paste0("Visão do ", creds_reactive()$tipo)})
 
+
+# Img e assets ------------------------------------------------------------
+
+    output$image <- renderImage({
+        list(src = "img/header.png",
+             alt = "Logo do projeto"
+        )
+    }, deleteFile = TRUE)    
 
 # Box ---------------------------------------------------------------------
 

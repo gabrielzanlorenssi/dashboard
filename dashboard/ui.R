@@ -48,22 +48,26 @@ idleTimer();"
 credentials <- read_excel('credentials.xlsx')
 
 #--- dashboard
-
+  
+  
 secure_app(language="pt-BR", head_auth = tags$script(inactivity),
            dashboardPage(
                skin="green",
                #-- header
-               dashboardHeader(title="Escola Segura - Instituto Gesto - teste", titleWidth = 450),
+               dashboardHeader(title=imageOutput("image"), titleWidth = 450),
                #-- sidebar
                dashboardSidebar(br(),
                                 sidebarMenu(
+                                    menuItem("Guia de utilização", tabName = "instr", icon = icon("question-circle")),
+                                    br(),
                                     menuItem(textOutput("munReferencia", inline=TRUE), tabName = "dashboard", icon = icon("city")),
+                                    br(),
                                     menuItem("Visão da escola", tabName = "escola", icon = icon("school")),
                                     uiOutput('options'),
                                     br(),
                                     menuItem("Download", tabName = "download", icon = icon("download")),
-                                    br(),
-                                    menuItem("Como usar", tabName = "instr", icon = icon("question-circle")))),
+                                    br()
+                                    )),
                
                # Body --------------------------------------------------------------------
                dashboardBody(
@@ -134,34 +138,20 @@ secure_app(language="pt-BR", head_auth = tags$script(inactivity),
                                     fluidRow(DTOutput('tblPrincipal'))),
                             #--- como usar
                             tabItem(tabName = "instr",
-                                    h2("Instruções"),
-                                    br(),
-                                    h3("Sobre o painel Escola Segura"),
-                                    br(),
-                                    p("O painel Escola Segura, desenvolvida pelo Instituto Gesto, é uma plataforma para o monitoramento de casos de covid-19 na comunidade escolar, seja em uma escola em específico ou em toda uma rede de ensino."),
-                                    p("Segundo o Dr. Márcio Bittencourt, as medidas pouco custosas são por vezes as mais efetivas para prevenção da covid-19. O painel é baseado na conclusão de estudo publicado na revista Science de medidas com maiores resultados na prevenção do contágio em escolas. Por ordem, as medidas são:"),
-                                    tags$ul(tags$li("Monitoramento de casos"),
-                                            tags$li("Máscara no professor"),
-                                            tags$li("Máscara no aluno"),
-                                            tags$li("Cancelamento de atividades extracurriculares"),
-                                            tags$li("Distanciamento e aulas ao ar livre")),
-                                    p("O monitoramento de casos é uma medida pouco custosa e com bons resultados. Esta plataforma interativa é um instrumento para as redes escolares realizarem um monitoramento rápido e eficaz, ajudando na tomada de decisões e no seguimento das atividades escolares."),
-                                    br(),
-                                    h3("Versão de testes"),
-                                    p("A versão atual do painel é uma versão de testes e nem todas as funcionalidades estão disponíveis. Com o preenchimento dos dados pelas escolas, estas opções estarão ativas."),
-                                    tags$ul(tags$li("Os dados na seção download é igual para todas as cidades."),
-                                            tags$li("Os dados das escolas são simulações. Nenhum dado sobre casos, adesão e turmas fechadas é real por enquanto."),
-                                            tags$li("Os gráficos de linha ao longo do tempo apresentam dados provisórios."),
-                                            tags$li("Novas informações ou visualizações podem ser adicionadas ou já estão em desenvolvimento. O que é exibido no painel é o que já está consolidado.")),
-                                    h3("Perguntas frequentes"),
-                                    br(),
-                                    strong(p("Como baixar gráficos e tabelas?")),
-                                    p("Os gráficos possuem uma aba dentro deles com a opção de baixar a imagem em png. Uma opção alternativa é tirar uma captura de tela (print screen) da imagem desejada. Clique aqui para ver instruções de como tirar uma captura de tela no Windows."),
-                                    p("As tabelas possuem três opções para serem baixadas, com três botões no canto inferior. Copy permite copiar a tabela, que pode ser colada em outro lugar usando o atalho CTRL + V. CSV permite baixar a tabela como um arquivo separado vírgulas, que um formato para um uso mais avançado dos dados. Excel é o formato mais tradicional, e baixa o arquivo como uma planilha que pode ser aberta no Excel ou editores gratuitos de planilhas"),
-                                    br(),
-                                    strong(p("Como o índice de adesão ao preenchimento é calculado?")),
-                                    p("Cada escola deve preencher diariamente o questionário, ainda que não tenha casos registrados ou turmas fechadas. Isto é importante para mensurar se um número baixo de casos está relacionado com o baixo preenchimento da ferramenta. O percentual de adesão indica a frequência de preenchimento na escola ou na rede (dependendo da visão selecionada), considerando apenas os dias úteis nos últimos 14 dias"),
-                                    br(),
-                                    strong(p("Tem mais alguma dúvida?")))
-                   ))))
+                    h2('Painel Escola Segura'),
+                    h3('Guia de Utilização'),    
+
+    p('Olá Gestor(a),'),
+    p("Para facilitar o monitoramento de casos de COVID-19 em sua unidade escolar e rede municipal, o Instituto Gesto desenvolveu a ferramenta Painel Escola Segura."),
+    p("O Painel é uma ferramenta colaborativa para auxiliar a secretaria de educação de sua rede a identificar novos casos e estabelecer uma comunicação direta entre os gestores escolares e a comunidade."),
+    p("Os dados deste painel são fornecidos por vocês, gestores escolares e da secretaria municipal de educação, através da Ferramenta para notificação de casos."),
+    p("A comunicação próxima e feita por pares é necessária para criarmos uma ponte direta e empática entre gestores e a comunidade e o mais importante - confiança com base em dados e estatística para uma melhor tomada de decisões estratégicas."),
+    br(),
+    h3("METODOLOGIA"),
+    br(),
+    p("As perguntas da Ferramenta para notificação de casos foram criadas para assegurar a notificação de casos suspeitos ou confirmados na escola."),
+    p("Para mantermos o painel atualizado, é importante que o formulário seja preenchido diariamente pela unidade escolar, mesmo que não haja casos suspeitos ou confirmados na escola. Lembre-se de manter o acompanhamento dos casos suspeitos, notificando sua confirmação caso necessário."),
+    p("Os dados respondidos através da Ferramenta de notificação sincronizam automaticamente no Painel Escola Segura.")
+
+                   )))))
 
